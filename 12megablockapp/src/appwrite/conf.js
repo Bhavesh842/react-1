@@ -17,8 +17,9 @@ class Services{
         this.Storage = new Storage(this.Client);
     }
 
-    async createPost(title,slug,content,fetauredimage,status,userid){
+    async createPost({title,slug,content,featuredimage,status,userid}){
         try {
+            console.log(title,slug,content,featuredimage,status,userid)
             return await this.Databases.createDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
@@ -26,7 +27,7 @@ class Services{
                 {
                     title:title, 
                     content:content,
-                    fetauredimage:fetauredimage,
+                    featuredimage:featuredimage,
                     status:status,
                     userid:userid
                 }
@@ -38,19 +39,13 @@ class Services{
     }
 
 
-     async updatePost(title,slug,content,fetauredimage,status,){
+     async updatePost(slug,data){
         try {
             return await this.Databases.updateDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
                 slug,
-                {
-                    title:title, 
-                    content:content,
-                    fetauredimage:fetauredimage,
-                    status:status,
-                   
-                }
+                data,
             );
         }    
          catch (error) {
@@ -99,6 +94,20 @@ class Services{
         }
     }
 
+    async getPostsByUser(userid) {
+    try {
+        return await this.Databases.listDocuments(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionId,
+            [
+                Query.equal('userid', userid),
+                Query.equal('status', 'active') // optional: only active posts
+            ]
+        );
+    } catch (error) {
+        console.log(error);
+    }
+}
 
     //upload file
 
@@ -128,16 +137,14 @@ class Services{
         }
     }
 
-    async getfilepreview(fileId){
-        try {
-            return this.Storage.getFilePreview(
-                conf.appwriteBucketId,
-                fileId,
-            )
-
-        } catch (error) {
-            console.log(error);
-        }
+   getfilepreview(fileId){
+        console.log(fileId)
+        const preview =this.Storage.getFileView(
+            conf.appwriteBucketId,
+            fileId,
+        )
+        console.log(preview)
+        return preview;
     }
 
 }

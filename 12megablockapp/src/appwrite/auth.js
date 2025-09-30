@@ -13,11 +13,14 @@ class AuthService {
         this.account = new Account(this.Client);
     }
 
-    async createAccount(email, password) {
+    async createAccount(email, password,name) {
         try{
-        const useraccount =await this.account.create(ID.unique(), email, password);
+            const userId    = ID.unique();
+            console.log(userId)
+        const useraccount =await this.account.create(userId, email, password,name);
+        
         if(useraccount){
-            this.login(email,password);
+           return this.login(email,password);
         }
             else{
                
@@ -33,7 +36,7 @@ class AuthService {
 
     async login(email,password){
         try {
-            return await this.account.createSession(email, password);
+            return await this.account.createEmailPasswordSession(email, password);
             
         } catch (error) {
             throw error;
@@ -58,7 +61,7 @@ class AuthService {
 
     async logout(){
         try {
-            return await this.account.deleteSession();
+            return await this.account.deleteSession('current');
         } catch (error) {
             throw error;
         }
